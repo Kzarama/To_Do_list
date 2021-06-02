@@ -54,7 +54,7 @@ const useStyles = makeStyles({
   typography_class: {
     textDecoration: "underline",
     textDecorationColor: "#00ccff",
-    margin: "25px",
+    margin: "20px auto 40px auto",
   },
   form_class: {
     width: "35%",
@@ -86,13 +86,13 @@ const useStyles = makeStyles({
   list_class: {
     width: "50%",
     margin: "auto",
-    marginTop: "30px",
+    marginTop: "20px",
   },
   list_item_class: {
     border: "4px solid #00ccff",
     borderRadius: "50px",
     background: "#313131",
-    margin: "10px",
+    marginBottom: "15px",
     paddingLeft: "30px",
     "&:hover": {
       background: "#121212",
