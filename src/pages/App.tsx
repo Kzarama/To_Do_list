@@ -12,6 +12,9 @@ import {
   ThemeProvider,
   Typography,
   withStyles,
+  Modal,
+  Fade,
+  Backdrop,
 } from "@material-ui/core";
 import DeleteIcon from "@material-ui/icons/Delete";
 import React, { useState } from "react";
@@ -70,6 +73,21 @@ const useStyles = makeStyles({
     color: "#00ccff",
     fontSize: "30px",
   },
+  modal: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  paper: {
+    color: "white",
+    backgroundColor: "#212121",
+    border: "4px solid #00ccff",
+    borderRadius: "25px",
+    boxShadow: theme.shadows[5],
+    position: "absolute",
+    width: 400,
+    padding: theme.spacing(2, 4, 3),
+  },
 });
 
 const CssTextField = withStyles({
@@ -99,7 +117,11 @@ interface ITask {
 function App(): JSX.Element {
   const classes = useStyles();
 
+  const [openModal, setOpenModal] = useState<boolean>(false);
+
   const [inputTask, setInputTask] = useState<string>("");
+  const [updateTask, setUpdateTask] = useState<ITask>();
+  const [idSelected, setIdSelected] = useState<number>(-1);
   const [tasks, setTasks] = useState<ITask[]>([]);
 
   const handleSubmit = (): void => {
@@ -113,6 +135,28 @@ function App(): JSX.Element {
     newTasks.splice(i, 1);
     setTasks(newTasks);
     console.log(tasks);
+  };
+
+  const handleUpdate = (): void => {
+    const newTask: ITask[] = [...tasks];
+    newTask[idSelected] = updateTask || newTask[idSelected];
+    setTasks(newTask);
+    setInputTask("");
+    handleClose();
+  };
+
+  const setUpdateTaskMethod = (name: string): void => {
+    setUpdateTask({ taskName: name });
+  };
+
+  const handleOpen = (i: number) => {
+    setOpenModal(true);
+    setUpdateTask(tasks[i]);
+    setIdSelected(i);
+  };
+
+  const handleClose = () => {
+    setOpenModal(false);
   };
 
   return (
@@ -141,7 +185,11 @@ function App(): JSX.Element {
         <List className={classes.list_class}>
           {tasks.map((task: ITask, i: number) => {
             return (
-              <ListItem key={i} className={classes.list_item_class}>
+              <ListItem
+                key={i}
+                className={classes.list_item_class}
+                onClick={() => handleOpen(i)}
+              >
                 <ListItemText primary={task.taskName} />
                 <ListItemSecondaryAction>
                   <IconButton onClick={() => handleDelete(i)}>
@@ -152,6 +200,46 @@ function App(): JSX.Element {
             );
           })}
         </List>
+        <Modal
+          open={openModal}
+          onClose={handleClose}
+          closeAfterTransition
+          className={classes.modal}
+          BackdropComponent={Backdrop}
+          BackdropProps={{
+            timeout: 500,
+          }}
+        >
+          <Fade in={openModal}>
+            <div className={classes.paper}>
+              <Typography variant="h4">Edit the task</Typography>
+              <CssTextField
+                value={updateTask?.taskName}
+                label="Task name"
+                variant="outlined"
+                onChange={(e) => setUpdateTaskMethod(e.target.value)}
+                InputLabelProps={{
+                  className: classes.textfield_label_class,
+                }}
+                InputProps={{
+                  className: classes.textfield_text_class,
+                }}
+              />
+              <Button
+                className={classes.add_button_class}
+                onClick={() => handleUpdate()}
+              >
+                Update
+              </Button>
+              <Button
+                className={classes.add_button_class}
+                onClick={handleClose}
+              >
+                Cancel
+              </Button>
+            </div>
+          </Fade>
+        </Modal>
       </ThemeProvider>
     </div>
   );
