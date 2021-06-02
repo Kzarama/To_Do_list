@@ -15,6 +15,7 @@ import {
   Modal,
   Fade,
   Backdrop,
+  Box,
 } from "@material-ui/core";
 import DeleteIcon from "@material-ui/icons/Delete";
 import React, { useState } from "react";
@@ -22,71 +23,6 @@ import React, { useState } from "react";
 const theme = createMuiTheme({
   typography: {
     fontFamily: ["Gloria Hallelujah", "sans-serif"].join(","),
-  },
-});
-
-const useStyles = makeStyles({
-  root: {
-    color: "white",
-    textAlign: "center",
-  },
-  typography_class: {
-    margin: "25px",
-    textDecoration: "underline",
-    textDecorationColor: "#00ccff",
-  },
-  form_class: {
-    alignItems: "center",
-  },
-  textfield_label_class: {
-    color: "white",
-  },
-  textfield_text_class: {
-    color: "white",
-  },
-  add_button_class: {
-    marginTop: "10px",
-    color: "#00ccff",
-    "&:hover": {
-      color: "white",
-      backgroundColor: "#00ccff",
-    },
-    "&:active": {
-      borderColor: "#00ccff",
-    },
-    "&:focus": {
-      boxShadow: "0 0 0 0.2rem rgba(0,240,255,.5)",
-    },
-  },
-  list_class: {
-    width: "50%",
-    marginTop: "30px",
-    margin: "auto",
-  },
-  list_item_class: {
-    margin: "10px",
-    border: "4px solid #00ccff",
-    borderRadius: "50px",
-    background: "#313131",
-  },
-  delete_icon_class: {
-    color: "#00ccff",
-    fontSize: "30px",
-  },
-  modal: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  paper: {
-    color: "white",
-    backgroundColor: "#212121",
-    border: "4px solid #00ccff",
-    borderRadius: "25px",
-    boxShadow: theme.shadows[5],
-    position: "absolute",
-    width: 400,
-    padding: theme.spacing(2, 4, 3),
   },
 });
 
@@ -109,6 +45,106 @@ const CssTextField = withStyles({
     },
   },
 })(TextField);
+
+const useStyles = makeStyles({
+  root: {
+    color: "white",
+    textAlign: "center",
+  },
+  typography_class: {
+    textDecoration: "underline",
+    textDecorationColor: "#00ccff",
+    margin: "25px",
+  },
+  form_class: {
+    width: "35%",
+    margin: "auto",
+  },
+  textfield_label_class: {
+    color: "white",
+    textAlign: "center",
+  },
+  textfield_text_class: {
+    color: "white",
+  },
+  add_button_class: {
+    color: "#00ccff",
+    width: "50%",
+    margin: "auto",
+    marginTop: "10px",
+    "&:hover": {
+      color: "white",
+      backgroundColor: "#00ccff",
+    },
+    "&:active": {
+      borderColor: "#00ccff",
+    },
+    "&:focus": {
+      boxShadow: "0 0 0 0.2rem rgba(0,240,255,.5)",
+    },
+  },
+  list_class: {
+    width: "50%",
+    margin: "auto",
+    marginTop: "30px",
+  },
+  list_item_class: {
+    border: "4px solid #00ccff",
+    borderRadius: "50px",
+    background: "#313131",
+    margin: "10px",
+    paddingLeft: "30px",
+    "&:hover": {
+      background: "#121212",
+    },
+  },
+  delete_icon_class: {
+    color: "#00ccff",
+    fontSize: "30px",
+  },
+  modal_class: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  paper_class: {
+    color: "white",
+    backgroundColor: "#212121",
+    border: "4px solid #00ccff",
+    borderRadius: "25px",
+    boxShadow: theme.shadows[5],
+    position: "absolute",
+    width: "35%",
+    padding: theme.spacing(2, 4, 3),
+  },
+  modal_title_class: {
+    textAlign: "center",
+    margin: "0px auto 15px auto",
+  },
+  modal_input_class: {
+    width: "97%",
+    margin: "auto",
+  },
+  modal_button_class: {
+    color: "#00ccff",
+    width: "35%",
+    margin: "auto 10px auto 10px",
+    marginTop: "10px",
+    "&:hover": {
+      color: "white",
+      backgroundColor: "#00ccff",
+    },
+    "&:active": {
+      borderColor: "#00ccff",
+    },
+    "&:focus": {
+      boxShadow: "0 0 0 0.2rem rgba(0,240,255,.5)",
+    },
+  },
+  modal_div_buttons_class: {
+    textAlign: "center",
+  },
+});
 
 interface ITask {
   taskName: string;
@@ -137,16 +173,16 @@ function App(): JSX.Element {
     console.log(tasks);
   };
 
+  const setUpdateTaskMethod = (name: string): void => {
+    setUpdateTask({ taskName: name });
+  };
+
   const handleUpdate = (): void => {
     const newTask: ITask[] = [...tasks];
     newTask[idSelected] = updateTask || newTask[idSelected];
     setTasks(newTask);
     setInputTask("");
-    handleClose();
-  };
-
-  const setUpdateTaskMethod = (name: string): void => {
-    setUpdateTask({ taskName: name });
+    setOpenModal(false);
   };
 
   const handleOpen = (i: number) => {
@@ -201,21 +237,24 @@ function App(): JSX.Element {
           })}
         </List>
         <Modal
+          className={classes.modal_class}
           open={openModal}
           onClose={handleClose}
           closeAfterTransition
-          className={classes.modal}
           BackdropComponent={Backdrop}
           BackdropProps={{
             timeout: 500,
           }}
         >
           <Fade in={openModal}>
-            <div className={classes.paper}>
-              <Typography variant="h4">Edit the task</Typography>
+            <Box component="div" className={classes.paper_class}>
+              <Typography variant="h4" className={classes.modal_title_class}>
+                Edit the task
+              </Typography>
               <CssTextField
                 value={updateTask?.taskName}
                 label="Task name"
+                className={classes.modal_input_class}
                 variant="outlined"
                 onChange={(e) => setUpdateTaskMethod(e.target.value)}
                 InputLabelProps={{
@@ -225,19 +264,21 @@ function App(): JSX.Element {
                   className: classes.textfield_text_class,
                 }}
               />
-              <Button
-                className={classes.add_button_class}
-                onClick={() => handleUpdate()}
-              >
-                Update
-              </Button>
-              <Button
-                className={classes.add_button_class}
-                onClick={handleClose}
-              >
-                Cancel
-              </Button>
-            </div>
+              <Box component="div" className={classes.modal_div_buttons_class}>
+                <Button
+                  className={classes.modal_button_class}
+                  onClick={() => handleUpdate()}
+                >
+                  Update
+                </Button>
+                <Button
+                  className={classes.modal_button_class}
+                  onClick={handleClose}
+                >
+                  Cancel
+                </Button>
+              </Box>
+            </Box>
           </Fade>
         </Modal>
       </ThemeProvider>
