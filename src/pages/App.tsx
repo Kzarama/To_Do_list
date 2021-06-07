@@ -100,6 +100,14 @@ const useStyles = makeStyles({
     textDecoration: "line-through",
     textDecorationColor: "red",
   },
+  primary_text_class: {
+    fontSize: "18px",
+    color: "white",
+  },
+  secondary_text_class: {
+    fontSize: "12px",
+    color: "#a6a6a6",
+  },
   icon_class: {
     color: "#00ccff",
     fontSize: "30px",
@@ -115,22 +123,21 @@ const useStyles = makeStyles({
     border: "4px solid #00ccff",
     borderRadius: "25px",
     position: "absolute",
-    width: "35%",
-    padding: "15px 20px 15px 20px",
+    width: "30%",
+    padding: "15px 40px 15px 40px",
   },
   modal_title_class: {
     textAlign: "center",
     margin: "0px auto 15px auto",
   },
   modal_input_class: {
-    width: "97%",
-    margin: "auto",
+    width: "100%",
+    margin: "10px auto",
   },
   modal_button_class: {
     color: "#00ccff",
     width: "35%",
-    margin: "auto 10px auto 10px",
-    marginTop: "10px",
+    margin: "10px 10px 10px 10px",
     "&:hover": {
       color: "white",
       backgroundColor: "#00ccff",
@@ -153,8 +160,10 @@ function App(): JSX.Element {
   const [openModalCreate, setOpenModalCreate] = useState<boolean>(false);
   const [openModalUpdate, setOpenModalUpdate] = useState<boolean>(false);
 
-  const [inputTask, setInputTask] = useState<string>("");
-  const [updateTask, setUpdateTask] = useState<ITask>();
+  const [inputTaskName, setInputTaskName] = useState<string>("");
+  const [inputTaskDescription, setInputTaskDescription] = useState<string>("");
+  const [updateTaskName, setUpdateTaskName] = useState<string>();
+  const [updateTaskDescription, setUpdateTaskDescription] = useState<string>();
   const [idSelected, setIdSelected] = useState<number>(-1);
 
   const [tasks, setTasks] = useState<ITask[]>([]);
@@ -162,10 +171,15 @@ function App(): JSX.Element {
   const handleSubmit = (): void => {
     const newTask: ITask[] = [
       ...tasks,
-      { taskName: inputTask, taskDone: false },
+      {
+        taskName: inputTaskName,
+        taskDescription: inputTaskDescription,
+        taskDone: false,
+      },
     ];
     setTasks(newTask);
-    setInputTask("");
+    setInputTaskName("");
+    setInputTaskDescription("");
     setOpenModalCreate(false);
   };
 
@@ -181,21 +195,22 @@ function App(): JSX.Element {
     setTasks(newTasks);
   };
 
-  const setUpdateTaskMethod = (name: string): void => {
-    setUpdateTask({ taskName: name, taskDone: tasks[idSelected].taskDone });
-  };
-
   const handleUpdate = (): void => {
     const newTask: ITask[] = [...tasks];
-    newTask[idSelected] = updateTask || newTask[idSelected];
+    newTask[idSelected].taskName =
+      updateTaskName || newTask[idSelected].taskName;
+    newTask[idSelected].taskDescription =
+      updateTaskDescription || newTask[idSelected].taskDescription;
     setTasks(newTask);
-    setInputTask("");
+    setInputTaskName("");
+    setInputTaskDescription("");
     setOpenModalUpdate(false);
   };
 
   const handleOpenUpdateModal = (i: number) => {
     setOpenModalUpdate(true);
-    setUpdateTask(tasks[i]);
+    setUpdateTaskName(tasks[i].taskName);
+    setUpdateTaskDescription(tasks[i].taskDescription);
     setIdSelected(i);
   };
 
@@ -226,11 +241,24 @@ function App(): JSX.Element {
               Create task
             </Typography>
             <CssTextField
-              value={inputTask}
+              value={inputTaskName}
               label="Task name"
               className={classes.modal_input_class}
               variant="outlined"
-              onChange={(e) => setInputTask(e.target.value)}
+              onChange={(e) => setInputTaskName(e.target.value)}
+              InputLabelProps={{
+                className: classes.textfield_label_class,
+              }}
+              InputProps={{
+                className: classes.textfield_text_class,
+              }}
+            />
+            <CssTextField
+              value={inputTaskDescription}
+              label="Task description"
+              className={classes.modal_input_class}
+              variant="outlined"
+              onChange={(e) => setInputTaskDescription(e.target.value)}
               InputLabelProps={{
                 className: classes.textfield_label_class,
               }}
@@ -255,6 +283,7 @@ function App(): JSX.Element {
           </Box>
         </Fade>
       </Modal>
+
       <List className={classes.list_class}>
         {tasks.map((task: ITask, i: number) => {
           return (
@@ -265,7 +294,16 @@ function App(): JSX.Element {
             >
               <ListItemText
                 className={tasks[i].taskDone ? classes.task_done_class : ""}
-                primary={task.taskName}
+                primary={
+                  <Typography className={classes.primary_text_class}>
+                    {task.taskName}
+                  </Typography>
+                }
+                secondary={
+                  <Typography className={classes.secondary_text_class}>
+                    {task.taskDescription}
+                  </Typography>
+                }
               />
               <ListItemSecondaryAction>
                 <IconButton onClick={() => toggleDone(i)}>
@@ -279,6 +317,7 @@ function App(): JSX.Element {
           );
         })}
       </List>
+
       <Modal
         className={classes.modal_class}
         open={openModalUpdate}
@@ -295,11 +334,24 @@ function App(): JSX.Element {
               Edit the task
             </Typography>
             <CssTextField
-              value={updateTask?.taskName}
+              value={updateTaskName}
               label="Task name"
               className={classes.modal_input_class}
               variant="outlined"
-              onChange={(e) => setUpdateTaskMethod(e.target.value)}
+              onChange={(e) => setUpdateTaskName(e.target.value)}
+              InputLabelProps={{
+                className: classes.textfield_label_class,
+              }}
+              InputProps={{
+                className: classes.textfield_text_class,
+              }}
+            />
+            <CssTextField
+              value={updateTaskDescription}
+              label="Task name"
+              className={classes.modal_input_class}
+              variant="outlined"
+              onChange={(e) => setUpdateTaskDescription(e.target.value)}
               InputLabelProps={{
                 className: classes.textfield_label_class,
               }}

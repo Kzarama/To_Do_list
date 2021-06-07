@@ -1,5 +1,6 @@
 interface ITask {
   taskName: string;
+  taskDescription: string;
   taskDone: boolean;
 }
 
