@@ -1,7 +1,5 @@
 import {
   Button,
-  createMuiTheme,
-  FormGroup,
   List,
   IconButton,
   ListItem,
@@ -9,7 +7,6 @@ import {
   ListItemText,
   makeStyles,
   TextField,
-  ThemeProvider,
   Typography,
   withStyles,
   Modal,
@@ -19,18 +16,11 @@ import {
 } from "@material-ui/core";
 import DeleteIcon from "@material-ui/icons/Delete";
 import Check from "@material-ui/icons/Check";
-// import Accessibility from "@material-ui/icons/Cancel";
 import React, { useState } from "react";
-
-const theme = createMuiTheme({
-  typography: {
-    fontFamily: ["Gloria Hallelujah", "sans-serif"].join(","),
-  },
-});
+import ITask from "../Interface/ITask";
 
 const CssTextField = withStyles({
   root: {
-    margin: "7px",
     "& label.Mui-focused": {
       color: "#00ccff",
     },
@@ -56,26 +46,22 @@ const useStyles = makeStyles({
   typography_class: {
     textDecoration: "underline",
     textDecorationColor: "#00ccff",
-    margin: "20px auto 40px auto",
-  },
-  form_class: {
-    width: "35%",
-    margin: "auto",
+    margin: "40px auto 40px auto",
   },
   textfield_label_class: {
     color: "white",
-    textAlign: "center",
   },
   textfield_text_class: {
     color: "white",
   },
   add_button_class: {
-    color: "#00ccff",
-    width: "50%",
-    margin: "auto",
-    marginTop: "10px",
+    width: "30%",
+    color: "white",
+    margin: "10px auto 50px auto",
+    border: "4px solid #00ccff",
+    borderRadius: "50px",
+    backgroundColor: "#313131",
     "&:hover": {
-      color: "white",
       backgroundColor: "#00ccff",
     },
     "&:active": {
@@ -87,9 +73,8 @@ const useStyles = makeStyles({
   },
   list_class: {
     width: "50%",
-    height: "55vh",
+    height: "58vh",
     margin: "auto",
-    marginTop: "20px",
     overflowY: "scroll",
     paddingRight: "10px",
   },
@@ -114,8 +99,6 @@ const useStyles = makeStyles({
   task_done_class: {
     textDecoration: "line-through",
     textDecorationColor: "red",
-    lineHeight: "50px",
-    textDecorationWidth: "50px",
   },
   icon_class: {
     color: "#00ccff",
@@ -131,10 +114,9 @@ const useStyles = makeStyles({
     backgroundColor: "#212121",
     border: "4px solid #00ccff",
     borderRadius: "25px",
-    boxShadow: theme.shadows[5],
     position: "absolute",
     width: "35%",
-    padding: theme.spacing(2, 4, 3),
+    padding: "15px 20px 15px 20px",
   },
   modal_title_class: {
     textAlign: "center",
@@ -165,19 +147,16 @@ const useStyles = makeStyles({
   },
 });
 
-interface ITask {
-  taskName: string;
-  taskDone: boolean;
-}
-
 function App(): JSX.Element {
   const classes = useStyles();
 
-  const [openModal, setOpenModal] = useState<boolean>(false);
+  const [openModalCreate, setOpenModalCreate] = useState<boolean>(false);
+  const [openModalUpdate, setOpenModalUpdate] = useState<boolean>(false);
 
   const [inputTask, setInputTask] = useState<string>("");
   const [updateTask, setUpdateTask] = useState<ITask>();
   const [idSelected, setIdSelected] = useState<number>(-1);
+
   const [tasks, setTasks] = useState<ITask[]>([]);
 
   const handleSubmit = (): void => {
@@ -187,6 +166,7 @@ function App(): JSX.Element {
     ];
     setTasks(newTask);
     setInputTask("");
+    setOpenModalCreate(false);
   };
 
   const toggleDone = (i: number): void => {
@@ -210,112 +190,140 @@ function App(): JSX.Element {
     newTask[idSelected] = updateTask || newTask[idSelected];
     setTasks(newTask);
     setInputTask("");
-    setOpenModal(false);
+    setOpenModalUpdate(false);
   };
 
-  const handleOpen = (i: number) => {
-    setOpenModal(true);
+  const handleOpenUpdateModal = (i: number) => {
+    setOpenModalUpdate(true);
     setUpdateTask(tasks[i]);
     setIdSelected(i);
   };
 
-  const handleClose = () => {
-    setOpenModal(false);
-  };
-
   return (
     <div className={classes.root}>
-      <ThemeProvider theme={theme}>
-        <Typography variant="h2" className={classes.typography_class}>
-          To Do list
-        </Typography>
-        <FormGroup className={classes.form_class}>
-          <CssTextField
-            value={inputTask}
-            label="Write the task"
-            variant="outlined"
-            onChange={(e) => setInputTask(e.target.value)}
-            InputLabelProps={{
-              className: classes.textfield_label_class,
-            }}
-            InputProps={{
-              className: classes.textfield_text_class,
-            }}
-          />
-          <Button className={classes.add_button_class} onClick={handleSubmit}>
-            Add task
-          </Button>
-        </FormGroup>
-        <List className={classes.list_class}>
-          {tasks.map((task: ITask, i: number) => {
-            return (
-              <ListItem
-                key={i}
-                className={classes.list_item_class}
-                onClick={() => handleOpen(i)}
+      <Typography variant="h2" className={classes.typography_class}>
+        To Do list
+      </Typography>
+      <Button
+        className={classes.add_button_class}
+        onClick={() => setOpenModalCreate(true)}
+      >
+        Add task
+      </Button>
+      <Modal
+        className={classes.modal_class}
+        open={openModalCreate}
+        onClose={() => setOpenModalCreate(false)}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{
+          timeout: 500,
+        }}
+      >
+        <Fade in={openModalCreate}>
+          <Box component="div" className={classes.paper_class}>
+            <Typography variant="h4" className={classes.modal_title_class}>
+              Create task
+            </Typography>
+            <CssTextField
+              value={inputTask}
+              label="Task name"
+              className={classes.modal_input_class}
+              variant="outlined"
+              onChange={(e) => setInputTask(e.target.value)}
+              InputLabelProps={{
+                className: classes.textfield_label_class,
+              }}
+              InputProps={{
+                className: classes.textfield_text_class,
+              }}
+            />
+            <Box component="div" className={classes.modal_div_buttons_class}>
+              <Button
+                className={classes.modal_button_class}
+                onClick={() => handleSubmit()}
               >
-                <ListItemText
-                  className={tasks[i].taskDone ? classes.task_done_class : ""}
-                  primary={task.taskName}
-                />
-                <ListItemSecondaryAction>
-                  <IconButton onClick={() => toggleDone(i)}>
-                    <Check className={classes.icon_class} />
-                  </IconButton>
-                  <IconButton onClick={() => handleDelete(i)}>
-                    <DeleteIcon className={classes.icon_class} />
-                  </IconButton>
-                </ListItemSecondaryAction>
-              </ListItem>
-            );
-          })}
-        </List>
-        <Modal
-          className={classes.modal_class}
-          open={openModal}
-          onClose={handleClose}
-          closeAfterTransition
-          BackdropComponent={Backdrop}
-          BackdropProps={{
-            timeout: 500,
-          }}
-        >
-          <Fade in={openModal}>
-            <Box component="div" className={classes.paper_class}>
-              <Typography variant="h4" className={classes.modal_title_class}>
-                Edit the task
-              </Typography>
-              <CssTextField
-                value={updateTask?.taskName}
-                label="Task name"
-                className={classes.modal_input_class}
-                variant="outlined"
-                onChange={(e) => setUpdateTaskMethod(e.target.value)}
-                InputLabelProps={{
-                  className: classes.textfield_label_class,
-                }}
-                InputProps={{
-                  className: classes.textfield_text_class,
-                }}
-              />
-              <Box component="div" className={classes.modal_div_buttons_class}>
-                <Button
-                  className={classes.modal_button_class}
-                  onClick={() => handleUpdate()}
-                >
-                  Update
-                </Button>
-                <Button
-                  className={classes.modal_button_class}
-                  onClick={handleClose}
-                >
-                  Cancel
-                </Button>
-              </Box>
+                Create
+              </Button>
+              <Button
+                className={classes.modal_button_class}
+                onClick={() => setOpenModalCreate(false)}
+              >
+                Cancel
+              </Button>
             </Box>
-          </Fade>
-        </Modal>
-      </ThemeProvider>
+          </Box>
+        </Fade>
+      </Modal>
+      <List className={classes.list_class}>
+        {tasks.map((task: ITask, i: number) => {
+          return (
+            <ListItem
+              key={i}
+              className={classes.list_item_class}
+              onClick={() => handleOpenUpdateModal(i)}
+            >
+              <ListItemText
+                className={tasks[i].taskDone ? classes.task_done_class : ""}
+                primary={task.taskName}
+              />
+              <ListItemSecondaryAction>
+                <IconButton onClick={() => toggleDone(i)}>
+                  <Check className={classes.icon_class} />
+                </IconButton>
+                <IconButton onClick={() => handleDelete(i)}>
+                  <DeleteIcon className={classes.icon_class} />
+                </IconButton>
+              </ListItemSecondaryAction>
+            </ListItem>
+          );
+        })}
+      </List>
+      <Modal
+        className={classes.modal_class}
+        open={openModalUpdate}
+        onClose={() => setOpenModalUpdate(false)}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{
+          timeout: 500,
+        }}
+      >
+        <Fade in={openModalUpdate}>
+          <Box component="div" className={classes.paper_class}>
+            <Typography variant="h4" className={classes.modal_title_class}>
+              Edit the task
+            </Typography>
+            <CssTextField
+              value={updateTask?.taskName}
+              label="Task name"
+              className={classes.modal_input_class}
+              variant="outlined"
+              onChange={(e) => setUpdateTaskMethod(e.target.value)}
+              InputLabelProps={{
+                className: classes.textfield_label_class,
+              }}
+              InputProps={{
+                className: classes.textfield_text_class,
+              }}
+            />
+            <Box component="div" className={classes.modal_div_buttons_class}>
+              <Button
+                className={classes.modal_button_class}
+                onClick={() => handleUpdate()}
+              >
+                Update
+              </Button>
+              <Button
+                className={classes.modal_button_class}
+                onClick={() => setOpenModalUpdate(false)}
+              >
+                Cancel
+              </Button>
+            </Box>
+          </Box>
+        </Fade>
+      </Modal>
     </div>
   );
 }
