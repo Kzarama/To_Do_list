@@ -1,3 +1,6 @@
+/**
+ * Interface of the tasks
+ */
 interface ITask {
   taskName: string;
   taskDescription: string;

@@ -3,6 +3,9 @@ import React from "react";
 import ReactDOM from "react-dom";
 import App from "./pages/App";
 
+/**
+ * constant with the font of the app
+ */
 const theme = createMuiTheme({
   typography: {
     fontFamily: ["Gloria Hallelujah", "sans-serif"].join(","),

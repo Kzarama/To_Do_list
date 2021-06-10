@@ -19,6 +19,7 @@ import Check from "@material-ui/icons/Check";
 import React, { useState } from "react";
 import ITask from "../Interface/ITask";
 
+// Styles of the text field
 const CssTextField = withStyles({
   root: {
     "& label.Mui-focused": {
@@ -38,6 +39,7 @@ const CssTextField = withStyles({
   },
 })(TextField);
 
+// General styles
 const useStyles = makeStyles({
   root: {
     color: "white",
@@ -154,20 +156,41 @@ const useStyles = makeStyles({
   },
 });
 
+/**
+ * Function app
+ * @returns The dom with the components of the app
+ */
 function App(): JSX.Element {
+  /**
+   * Styles of the components
+   */
   const classes = useStyles();
-
+  /**
+   * State to open the respective modals
+   */
   const [openModalCreate, setOpenModalCreate] = useState<boolean>(false);
   const [openModalUpdate, setOpenModalUpdate] = useState<boolean>(false);
-
+  /**
+   * State with the inputs of the task to create
+   */
   const [inputTaskName, setInputTaskName] = useState<string>("");
   const [inputTaskDescription, setInputTaskDescription] = useState<string>("");
+  /**
+   * State with the inputs of the task to update
+   */
   const [updateTaskName, setUpdateTaskName] = useState<string>();
   const [updateTaskDescription, setUpdateTaskDescription] = useState<string>();
+  /**
+   * Id of the task selected to update
+   */
   const [idSelected, setIdSelected] = useState<number>(-1);
-
+  /**
+   * State with all task saved
+   */
   const [tasks, setTasks] = useState<ITask[]>([]);
-
+  /**
+   * Save a task, clean the inputs and close the modal
+   */
   const handleSubmit = (): void => {
     const newTask: ITask[] = [
       ...tasks,
@@ -182,19 +205,27 @@ function App(): JSX.Element {
     setInputTaskDescription("");
     setOpenModalCreate(false);
   };
-
+  /**
+   * Change the state of done of a task
+   * @param i id of the task to change done state
+   */
   const toggleDone = (i: number): void => {
     const taskDone: ITask[] = [...tasks];
     taskDone[i].taskDone = !taskDone[i].taskDone;
     setTasks(taskDone);
   };
-
+  /**
+   * Delete a task
+   * @param i id of the task to delete
+   */
   const handleDelete = (i: number): void => {
     const newTasks: ITask[] = [...tasks];
     newTasks.splice(i, 1);
     setTasks(newTasks);
   };
-
+  /**
+   * Update the information of a task, clean the state of the inputs and close the modal
+   */
   const handleUpdate = (): void => {
     const newTask: ITask[] = [...tasks];
     newTask[idSelected].taskName =
@@ -206,7 +237,10 @@ function App(): JSX.Element {
     setInputTaskDescription("");
     setOpenModalUpdate(false);
   };
-
+  /**
+   * Set the id of the task to update and open the modal to update
+   * @param i id of the task to update
+   */
   const handleOpenUpdateModal = (i: number) => {
     setOpenModalUpdate(true);
     setUpdateTaskName(tasks[i].taskName);
